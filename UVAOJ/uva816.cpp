@@ -202,6 +202,8 @@ bool bfs(Maze& maze, int startR, int startC, int startDir, int endR, int endC) {
 	return false;
 }
 int main() {
+	ios::sync_with_stdio(false);
+
 	string kaseName;
 	while(true) {
 		cin >> kaseName;
