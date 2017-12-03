@@ -11,7 +11,7 @@ class Solution {
       public int compareTo(Info o) {
         return sorted.compareTo(o.sorted);
       }
-	  }
+    }
 	
     public List<List<String>> groupAnagrams(String[] strs) {
     	
