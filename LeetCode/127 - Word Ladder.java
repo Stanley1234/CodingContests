@@ -1,87 +1,55 @@
-// SLOW - 1000 Ms
+import java.util.*;
 
-class Solution {
-    
-    private int ans = 0;
-    
-    private int differBy(String w1, String w2) {
-    	int d = 0;
-    	for(int i = 0;i < w1.length();i ++)
-    		if(w1.charAt(i) != w2.charAt(i))
-    			d ++;
-    	return d;
+public class Soln_127 {
+
+    private class Pair<E, V> {
+        E key;
+        V value;
+        Pair(E e, V v) {
+            key = e;
+            value = v;
+        }
     }
-   
-    private int createMap(List<List<Integer>> wordMap,
-    					String beginWord, List<String> wordList) {	
-    	int beginWordIndex = -1;
-    	for(int i = 0;i < wordList.size();i ++) {		
-    		if(wordList.get(i).equals(beginWord)) {
-    			beginWordIndex = i;
-    			continue;
-    		}	
-    		List<Integer> curVertex = new ArrayList<>();
-    		for(int j = 0;j < wordList.size();j ++) {
-    			if(i == j) continue;
-    			if(differBy(wordList.get(i), wordList.get(j)) == 1) {
-    				curVertex.add(j);
-    			}
-    		}
-    		wordMap.add(curVertex);
-    	}
-    	// add beginWord into map
-    	List<Integer> beginVertex = new ArrayList<>();
-    	for(int i = 0;i < wordList.size();i ++) {
-    		if(beginWordIndex == i || differBy(beginWord, wordList.get(i)) != 1) continue;
-    		beginVertex.add(i);
-    	}
-    	if(beginWordIndex == -1)
-    		beginWordIndex = wordList.size();
-    	wordMap.add(beginWordIndex, beginVertex);
-    	return beginWordIndex;
+
+    private boolean differByOne(String cur1, String cur2) {
+        int diff = 0;
+        for(int i = 0;i < cur1.length();i ++) {
+            if(cur1.charAt(i) != cur2.charAt(i))
+                diff ++;
+            if(diff > 1)
+                return false;
+        }
+        return diff == 1;
     }
-    
-    private void BFS(int beginIndex, int endIndex,  List<List<Integer>> wordMap) {
-    	 Queue<Integer> q = new LinkedList<>();
-    	 Map<Integer, Integer> steps = new HashMap<>();
-    	 
-    	 q.add(beginIndex);
-    	 steps.put(beginIndex, 1);
-    	 while(!q.isEmpty()) {
-    		 int curIndex = q.poll();
-    		 List<Integer> curVertex = wordMap.get(curIndex);
-    		 
-    		 if(curIndex == endIndex) {
-    			 ans = steps.get(endIndex);
-    			 return;
-    		 }
-    		 
-    		 for(int i = 0;i < curVertex.size();i ++) {
-    			 int destIndex = curVertex.get(i);
-    			 if(steps.containsKey(destIndex))
-    				 continue;
-       			 q.add(destIndex);
-    			 steps.put(destIndex, steps.get(curIndex) + 1);
-    		 }
-    	 }
-    }
-    
-    private int search(String s, List<String> list) {
-    	for(int i = 0;i < list.size();i ++)
-    		if(s.equals(list.get(i)))
-    			return i;
-    	return -1;
-    }
-    
+
     public int ladderLength(String beginWord, String endWord, List<String> wordList) {
-    	// create a map
-    	List<List<Integer>> wordMap = new ArrayList<>();
-    	int beginIndex = createMap(wordMap, beginWord, wordList);
-    	int endIndex = search(endWord, wordList);
-    	if(endIndex == -1)
-    		return 0;
-    	// bfs to search all paths
-    	BFS(beginIndex, endIndex, wordMap);
-    	return ans;
+        Queue<Pair<Integer, String>> q = new LinkedList<>();
+        ((LinkedList<Pair<Integer,String>>) q).offer(new Pair<>(1, beginWord));
+        wordList.remove(beginWord);
+
+        while(!q.isEmpty()) {
+            Pair<Integer, String> cur = q.poll();
+            ListIterator<String> iter = wordList.listIterator();
+            while(iter.hasNext()) {
+                String other = iter.next();
+                if(differByOne(cur.value, other)) {
+                    if(other.equals(endWord))
+                        return cur.key + 1;
+                    ((LinkedList<Pair<Integer,String>>) q).offer(new Pair<>(cur.key + 1, other));
+                    iter.remove();
+                }
+            }
+        }
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Soln_127 soln_127 = new Soln_127();
+        List<String> wordList = new ArrayList<>();
+        String[] strs1 = {"kid","tag","pup","ail","tun","woo","erg","luz","brr","gay","sip","kay","per","val","mes","ohs","now","boa","cet","pal","bar","die","war","hay","eco","pub","lob","rue","fry","lit","rex","jan","cot","bid","ali","pay","col","gum","ger","row","won","dan","rum","fad","tut","sag","yip","sui","ark","has","zip","fez","own","ump","dis","ads","max","jaw","out","btu","ana","gap","cry","led","abe","box","ore","pig","fie","toy","fat","cal","lie","noh","sew","ono","tam","flu","mgm","ply","awe","pry","tit","tie","yet","too","tax","jim","san","pan","map","ski","ova","wed","non","wac","nut","why","bye","lye","oct","old","fin","feb","chi","sap","owl","log","tod","dot","bow","fob","for","joe","ivy","fan","age","fax","hip","jib","mel","hus","sob","ifs","tab","ara","dab","jag","jar","arm","lot","tom","sax","tex","yum","pei","wen","wry","ire","irk","far","mew","wit","doe","gas","rte","ian","pot","ask","wag","hag","amy","nag","ron","soy","gin","don","tug","fay","vic","boo","nam","ave","buy","sop","but","orb","fen","paw","his","sub","bob","yea","oft","inn","rod","yam","pew","web","hod","hun","gyp","wei","wis","rob","gad","pie","mon","dog","bib","rub","ere","dig","era","cat","fox","bee","mod","day","apr","vie","nev","jam","pam","new","aye","ani","and","ibm","yap","can","pyx","tar","kin","fog","hum","pip","cup","dye","lyx","jog","nun","par","wan","fey","bus","oak","bad","ats","set","qom","vat","eat","pus","rev","axe","ion","six","ila","lao","mom","mas","pro","few","opt","poe","art","ash","oar","cap","lop","may","shy","rid","bat","sum","rim","fee","bmw","sky","maj","hue","thy","ava","rap","den","fla","auk","cox","ibo","hey","saw","vim","sec","ltd","you","its","tat","dew","eva","tog","ram","let","see","zit","maw","nix","ate","gig","rep","owe","ind","hog","eve","sam","zoo","any","dow","cod","bed","vet","ham","sis","hex","via","fir","nod","mao","aug","mum","hoe","bah","hal","keg","hew","zed","tow","gog","ass","dem","who","bet","gos","son","ear","spy","kit","boy","due","sen","oaf","mix","hep","fur","ada","bin","nil","mia","ewe","hit","fix","sad","rib","eye","hop","haw","wax","mid","tad","ken","wad","rye","pap","bog","gut","ito","woe","our","ado","sin","mad","ray","hon","roy","dip","hen","iva","lug","asp","hui","yak","bay","poi","yep","bun","try","lad","elm","nat","wyo","gym","dug","toe","dee","wig","sly","rip","geo","cog","pas","zen","odd","nan","lay","pod","fit","hem","joy","bum","rio","yon","dec","leg","put","sue","dim","pet","yaw","nub","bit","bur","sid","sun","oil","red","doc","moe","caw","eel","dix","cub","end","gem","off","yew","hug","pop","tub","sgt","lid","pun","ton","sol","din","yup","jab","pea","bug","gag","mil","jig","hub","low","did","tin","get","gte","sox","lei","mig","fig","lon","use","ban","flo","nov","jut","bag","mir","sty","lap","two","ins","con","ant","net","tux","ode","stu","mug","cad","nap","gun","fop","tot","sow","sal","sic","ted","wot","del","imp","cob","way","ann","tan","mci","job","wet","ism","err","him","all","pad","hah","hie","aim","ike","jed","ego","mac","baa","min","com","ill","was","cab","ago","ina","big","ilk","gal","tap","duh","ola","ran","lab","top","gob","hot","ora","tia","kip","han","met","hut","she","sac","fed","goo","tee","ell","not","act","gil","rut","ala","ape","rig","cid","god","duo","lin","aid","gel","awl","lag","elf","liz","ref","aha","fib","oho","tho","her","nor","ace","adz","fun","ned","coo","win","tao","coy","van","man","pit","guy","foe","hid","mai","sup","jay","hob","mow","jot","are","pol","arc","lax","aft","alb","len","air","pug","pox","vow","got","meg","zoe","amp","ale","bud","gee","pin","dun","pat","ten","mob"};
+        String[] strs2 = {"ac", "ag", "bc", "bg"};
+        for(int i = 0;i < strs2.length;i ++)
+            wordList.add(strs2[i]);
+        System.out.println(soln_127.ladderLength("ab", "bc", wordList));
     }
 }
