@@ -1,21 +1,16 @@
-// Time complexity: O(n^2 m)
-// where n is the length of string and m is the longest length of string in wordDict
-
 class Solution {
-    public boolean wordBreak(String s, List<String> wordDict) {
-        boolean[] dp = new boolean[s.length()];
-        
+    public boolean wordBreak(String s, List<String> wordDict) {       
+        // pos : if the substring [0 ... pos] is made up from words in dict
+        Set<Integer> validPos = new HashSet<>();
         for(int i = 0;i < s.length();i ++) {
-            dp[i] = false;
-            for(int j = i;j >= 0;j --) {
-                if(wordDict.contains(s.substring(j, i + 1))) {
-                    if(j == 0 || dp[j - 1] == true) {
-                        dp[i] = true;
-                        break;
-                    }
+            for(String word : wordDict) {          
+                if((i == word.length() - 1 || 
+                   validPos.contains(i - word.length())) && s.substring(i - word.length() + 1, i + 1).equals(word)) {                  	
+                    validPos.add(i);
+                    break;
                 }
-            }
+            }          	
         }
-        return dp[s.length() - 1];
+        return validPos.contains(s.length() - 1);
     }
 }
